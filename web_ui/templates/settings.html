@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0 fw-semibold">Instellingen</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/settings">
+
+          <h6 class="text-muted mb-3">
+            <i class="bi bi-telegram me-1"></i> Telegram notificaties
+          </h6>
+
+          <div class="mb-3">
+            <label class="form-label">Bot Token</label>
+            <input type="text" name="telegram_token" class="form-control font-monospace"
+                   value="{{ settings.get('telegram_token', '') }}"
+                   placeholder="123456:ABCdef...">
+            <div class="form-text">
+              Maak een bot via <a href="https://t.me/BotFather" target="_blank">@BotFather</a>
+              en kopieer het token hier.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Chat ID</label>
+            <input type="text" name="telegram_chat_id" class="form-control"
+                   value="{{ settings.get('telegram_chat_id', '') }}"
+                   placeholder="-100123456789 of 123456789">
+            <div class="form-text">
+              Stuur een bericht naar <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+              om je chat ID te vinden.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <button type="button" class="btn btn-outline-secondary" id="testBtn">
+              <i class="bi bi-send me-1"></i> Verstuur testbericht
+            </button>
+            <div id="testResult" class="mt-2"></div>
+          </div>
+
+          <hr>
+
+          <h6 class="text-muted mb-3">
+            <i class="bi bi-clock me-1"></i> Polling
+          </h6>
+
+          <div class="mb-4">
+            <label class="form-label">Interval (seconden)</label>
+            <input type="number" name="poll_interval" class="form-control"
+                   value="{{ settings.get('poll_interval', '60') }}"
+                   min="30" max="3600" step="10">
+            <div class="form-text">
+              Hoe vaak wordt marktplaats.nl gecheckt? Minimum 30 seconden.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2 me-1"></i> Opslaan
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('testBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('testBtn');
+  const result = document.getElementById('testResult');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Testen...';
+
+  try {
+    const resp = await fetch('/settings/test-telegram', { method: 'POST' });
+    const data = await resp.json();
+    result.innerHTML = `<div class="alert alert-${data.success ? 'success' : 'danger'} py-2 mb-0">${data.message}</div>`;
+  } catch (e) {
+    result.innerHTML = `<div class="alert alert-danger py-2 mb-0">Netwerkfout: ${e}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-send me-1"></i> Verstuur testbericht';
+});
+</script>
+{% endblock %}

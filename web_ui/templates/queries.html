@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row g-4">
+  <!-- Add form -->
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0 fw-semibold">Zoekopdracht toevoegen</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/queries/add">
+          <div class="mb-3">
+            <label class="form-label">Naam <span class="text-muted">(optioneel)</span></label>
+            <input type="text" name="name" class="form-control"
+                   placeholder="bijv. Nike Air Max 42">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Marktplaats zoek-URL</label>
+            <input type="url" name="url" class="form-control" required
+                   placeholder="https://www.marktplaats.nl/q/sneakers/">
+            <div class="form-text">
+              Zoek iets op marktplaats.nl en kopieer de URL uit de adresbalk.
+              Je kunt ook gefilterde zoek-URL's gebruiken.
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-plus-circle me-1"></i> Toevoegen
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <h6 class="fw-semibold">Tip: URL-voorbeelden</h6>
+        <ul class="small text-muted mb-0">
+          <li><code>https://www.marktplaats.nl/q/iphone/</code></li>
+          <li><code>https://www.marktplaats.nl/l/computers-en-software/laptops/</code></li>
+          <li><code>https://www.marktplaats.nl/q/fiets/#PriceCentsTo:50000</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header py-3">
+        <h6 class="mb-0 fw-semibold">Zoekopdrachten ({{ queries|length }})</h6>
+      </div>
+
+      {% if queries %}
+      <div class="list-group list-group-flush">
+        {% for q in queries %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <div class="overflow-hidden">
+              <div class="fw-semibold text-truncate">{{ q.name or q.url }}</div>
+              {% if q.name %}
+              <div class="small text-muted text-break">{{ q.url }}</div>
+              {% endif %}
+              {% if q.last_checked %}
+              <div class="small text-muted">
+                <i class="bi bi-clock"></i> {{ q.last_checked[:16] }}
+              </div>
+              {% else %}
+              <div class="small text-muted">Nog niet gecheckt</div>
+              {% endif %}
+            </div>
+            <form method="POST" action="/queries/remove/{{ q.id }}"
+                  onsubmit="return confirm('Zoekopdracht en bijbehorende advertenties verwijderen?')">
+              <button class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-plus-circle fs-1 d-block mb-2"></i>
+        Voeg links een eerste zoekopdracht toe.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

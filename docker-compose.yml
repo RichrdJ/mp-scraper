@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  marktplaats-notifications:
+    build: .
+    container_name: marktplaats-notifications
+    ports:
+      - "7070:7070"
+    volumes:
+      - mp_data:/app/data
+    environment:
+      - DB_PATH=/app/data/marktplaats.db
+      # Optional: override the Flask secret key
+      # - SECRET_KEY=verander-dit-naar-iets-random
+    restart: unless-stopped
+
+volumes:
+  mp_data:

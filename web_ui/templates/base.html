@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,21 +7,143 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body { background: #f4f5f7; }
-    .navbar { background: #002F34 !important; }
-    .navbar-brand { color: #FFE500 !important; font-weight: 700; font-size: 1.2rem; }
-    .navbar-brand:hover { color: #FFE500 !important; }
-    .nav-link { color: rgba(255,255,255,.8) !important; }
-    .nav-link:hover, .nav-link.active { color: #FFE500 !important; }
-    .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.08); border-radius: 10px; }
-    .listing-thumb { width: 72px; height: 72px; min-width: 72px; object-fit: cover; border-radius: 8px; }
+    /* ── Light theme variables ── */
+    :root, [data-theme="light"] {
+      --bg:           #f4f5f7;
+      --surface:      #ffffff;
+      --surface-2:    #f8f9fa;
+      --border:       #dee2e6;
+      --text:         #212529;
+      --text-muted:   #6c757d;
+      --nav-bg:       #002F34;
+      --nav-hover:    #FFE500;
+      --brand-color:  #FFE500;
+      --badge-bg:     #002F34;
+      --input-bg:     #ffffff;
+      --input-border: #ced4da;
+      --link-color:   #004d54;
+    }
+
+    /* ── Dark theme variables ── */
+    [data-theme="dark"] {
+      --bg:           #0f1117;
+      --surface:      #1a1d27;
+      --surface-2:    #23263a;
+      --border:       #2e3147;
+      --text:         #e8eaf0;
+      --text-muted:   #8b90a8;
+      --nav-bg:       #001a1d;
+      --nav-hover:    #FFE500;
+      --brand-color:  #FFE500;
+      --badge-bg:     #002F34;
+      --input-bg:     #23263a;
+      --input-border: #3a3e5c;
+      --link-color:   #00b8c8;
+    }
+
+    /* ── Base ── */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      transition: background .2s, color .2s;
+    }
+    a { color: var(--link-color); }
+    a:hover { color: var(--link-color); opacity: .85; }
+
+    /* ── Navbar ── */
+    .navbar { background: var(--nav-bg) !important; border-bottom: 1px solid rgba(0,0,0,.2); }
+    .navbar-brand { color: var(--brand-color) !important; font-weight: 700; font-size: 1.2rem; }
+    .navbar-brand:hover { color: var(--brand-color) !important; }
+    .nav-link { color: rgba(255,255,255,.8) !important; transition: color .15s; }
+    .nav-link:hover, .nav-link.active { color: var(--nav-hover) !important; }
+
+    /* ── Dark mode toggle ── */
+    #darkToggle {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.3);
+      color: rgba(255,255,255,.85);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: .85rem;
+      transition: all .15s;
+      cursor: pointer;
+    }
+    #darkToggle:hover { border-color: var(--nav-hover); color: var(--nav-hover); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border) !important;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+    .card-header {
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── List group ── */
+    .list-group-item {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .list-group-item:hover { background: var(--surface-2); }
+    .list-group-item-action { transition: background .1s; }
+
+    /* ── Form controls ── */
+    .form-control, .form-select {
+      background: var(--input-bg);
+      border-color: var(--input-border);
+      color: var(--text);
+    }
+    .form-control:focus, .form-select:focus {
+      background: var(--input-bg);
+      color: var(--text);
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 .2rem rgba(0,47,52,.2);
+    }
+    .form-text { color: var(--text-muted); }
+
+    /* ── Alerts ── */
+    .alert-success { background: #1e4d2b; border-color: #27643a; color: #9fe4b4; }
+    .alert-danger  { background: #4d1e1e; border-color: #6a2a2a; color: #f4a3a3; }
+    [data-theme="light"] .alert-success { background: #d1e7dd; border-color: #badbcc; color: #0f5132; }
+    [data-theme="light"] .alert-danger  { background: #f8d7da; border-color: #f5c2c7; color: #842029; }
+
+    /* ── Badges ── */
+    .badge-price { background: var(--badge-bg); font-size: .85rem; }
+
+    /* ── Thumbs ── */
+    .listing-thumb {
+      width: 72px; height: 72px; min-width: 72px;
+      object-fit: cover; border-radius: 8px;
+    }
     .listing-thumb-placeholder {
       width: 72px; height: 72px; min-width: 72px;
-      background: #e9ecef; border-radius: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
     }
-    .badge-price { background: #002F34; font-size: .85rem; }
+
+    /* ── Stats ── */
     .stat-card h2 { font-size: 2rem; font-weight: 700; }
+
+    /* ── Misc ── */
+    .text-muted { color: var(--text-muted) !important; }
+    hr { border-color: var(--border); }
+    .btn-outline-secondary {
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-outline-secondary:hover {
+      background: var(--surface-2);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline-danger { color: #e05252; border-color: #e05252; }
+    .btn-outline-danger:hover { background: #c0392b; border-color: #c0392b; color: #fff; }
   </style>
 </head>
 <body>
@@ -31,9 +153,15 @@
     <a class="navbar-brand" href="/">
       <i class="bi bi-bell-fill me-1"></i> Marktplaats Notificaties
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <div class="d-flex align-items-center gap-2 order-lg-last ms-auto ms-lg-0">
+      <button id="darkToggle" title="Toggle dark mode">
+        <i class="bi bi-moon-stars-fill" id="darkIcon"></i>
+        <span id="darkLabel">Dark</span>
+      </button>
+      <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
     <div class="collapse navbar-collapse" id="nav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Dashboard</a></li>
@@ -61,6 +189,28 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ── Dark mode toggle ──────────────────────────────────────────────────────
+  const html  = document.documentElement;
+  const btn   = document.getElementById('darkToggle');
+  const icon  = document.getElementById('darkIcon');
+  const label = document.getElementById('darkLabel');
+
+  function applyTheme(dark) {
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    icon.className    = dark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+    label.textContent = dark ? 'Light' : 'Dark';
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }
+
+  // Restore saved preference (default: dark)
+  const saved = localStorage.getItem('theme') ?? 'dark';
+  applyTheme(saved === 'dark');
+
+  btn.addEventListener('click', () => {
+    applyTheme(html.getAttribute('data-theme') !== 'dark');
+  });
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

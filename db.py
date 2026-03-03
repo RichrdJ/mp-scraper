@@ -18,6 +18,7 @@ def init_db():
                 url         TEXT UNIQUE NOT NULL,
                 name        TEXT,
                 enabled     INTEGER NOT NULL DEFAULT 1,
+                seeded      INTEGER NOT NULL DEFAULT 0,
                 created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_checked TEXT
             );
@@ -88,6 +89,20 @@ def update_last_checked(query_id: int):
             "UPDATE queries SET last_checked = ? WHERE id = ?",
             (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), query_id),
         )
+
+
+def mark_seeded(query_id: int):
+    with get_conn() as conn:
+        conn.execute("UPDATE queries SET seeded = 1 WHERE id = ?", (query_id,))
+
+
+def migrate():
+    """Add columns introduced after initial schema creation."""
+    with get_conn() as conn:
+        try:
+            conn.execute("ALTER TABLE queries ADD COLUMN seeded INTEGER NOT NULL DEFAULT 0")
+        except Exception:
+            pass  # column already exists
 
 
 # ---------------------------------------------------------------------------

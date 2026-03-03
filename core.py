@@ -34,6 +34,7 @@ def poll_loop():
                     f"{len(listings)} listings gevonden"
                 )
 
+                is_seeded = bool(query["seeded"])
                 new_count = 0
                 for listing in listings:
                     if not db.item_exists(listing.mp_id, query["id"]):
@@ -46,10 +47,14 @@ def poll_loop():
                             image_url=listing.image_url,
                             description=listing.description,
                         )
-                        _new_items_queue.put((listing, dict(query)))
-                        new_count += 1
+                        if is_seeded:
+                            _new_items_queue.put((listing, dict(query)))
+                            new_count += 1
 
-                if new_count:
+                if not is_seeded:
+                    db.mark_seeded(query["id"])
+                    logger.info(f"  → seed: {len(listings)} bestaande advertenties opgeslagen, geen notificaties")
+                elif new_count:
                     logger.info(f"  → {new_count} nieuw")
 
                 db.update_last_checked(query["id"])
@@ -86,6 +91,7 @@ def notification_loop():
 
 def start():
     db.init_db()
+    db.migrate()
     _stop_event.clear()
 
     threading.Thread(target=poll_loop, daemon=True, name="poll-loop").start()

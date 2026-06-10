@@ -4,7 +4,9 @@
 {% block content %}
 <h4 class="fw-bold mb-4"><i class="bi bi-gear me-2"></i>{{ t.settings_title }}</h4>
 
-<form method="post">
+<!-- Main save form — contains all inputs -->
+<form method="post" id="saveForm">
+
   <!-- Discord -->
   <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body p-4">
@@ -36,12 +38,12 @@
         <h5 class="fw-semibold mb-0">
           <i class="bi bi-telegram me-2" style="color:#229ed9"></i>Telegram
         </h5>
-        <form method="post" action="/settings/toggle/telegram">
-          <button type="submit" class="btn btn-sm {{ 'btn-warning' if telegram_enabled else 'btn-outline-secondary' }}">
-            <i class="bi {{ 'bi-pause-fill' if telegram_enabled else 'bi-play-fill' }} me-1"></i>
-            {{ t.settings_pause_btn if telegram_enabled else t.settings_resume_btn }}
-          </button>
-        </form>
+        <!-- This button belongs to telegramToggleForm, not saveForm -->
+        <button type="submit" form="telegramToggleForm"
+                class="btn btn-sm {{ 'btn-warning' if telegram_enabled else 'btn-outline-secondary' }}">
+          <i class="bi {{ 'bi-pause-fill' if telegram_enabled else 'bi-play-fill' }} me-1"></i>
+          {{ t.settings_pause_btn if telegram_enabled else t.settings_resume_btn }}
+        </button>
       </div>
       <p class="text-muted small mb-3">
         {{ t.settings_tg_desc_1 }} <a href="https://t.me/BotFather" target="_blank">@BotFather</a>
@@ -73,7 +75,11 @@
   <button type="submit" class="btn btn-mp px-4">
     <i class="bi bi-floppy me-1"></i>{{ t.settings_save_btn }}
   </button>
+
 </form>
+
+<!-- Telegram toggle form — outside saveForm to prevent nesting -->
+<form id="telegramToggleForm" method="post" action="/settings/toggle/telegram"></form>
 
 <!-- Language -->
 <div class="card border-0 shadow-sm rounded-3 mt-4">

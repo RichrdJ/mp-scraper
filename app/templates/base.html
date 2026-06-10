@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl" data-theme="light">
+<html lang="{{ lang }}" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,7 +71,6 @@
     .navbar .nav-link:hover,
     .navbar .nav-link.active { color: #fff !important; }
 
-    /* Dark mode toggle button */
     #theme-toggle {
       background: rgba(255,255,255,.15);
       border: none;
@@ -103,9 +102,7 @@
       overflow: hidden;
     }
     .item-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .item-card .item-thumb {
-      width: 100%; height: 160px; object-fit: cover;
-    }
+    .item-card .item-thumb { width: 100%; height: 160px; object-fit: cover; }
     .item-card .item-thumb-placeholder {
       height: 160px;
       background: var(--thumb-bg);
@@ -115,7 +112,7 @@
     .item-price { font-size: 1.1rem; font-weight: 700; color: var(--mp-orange); }
     .badge-search { background: var(--mp-orange); font-size: .7rem; }
 
-    /* ── Log box (always dark — it's a terminal) ──────────────────────────── */
+    /* ── Log box ──────────────────────────────────────────────────────────── */
     .log-box {
       background: #0d0f14;
       color: #cdd6f4;
@@ -132,10 +129,7 @@
     .log-DEBUG   { color: #89b4fa; }
 
     /* ── Table ────────────────────────────────────────────────────────────── */
-    .table {
-      color: var(--text-main) !important;
-      border-color: var(--border-color) !important;
-    }
+    .table { color: var(--text-main) !important; border-color: var(--border-color) !important; }
     .table thead th {
       font-size: .8rem; text-transform: uppercase;
       letter-spacing: .05em; color: var(--text-muted);
@@ -156,7 +150,7 @@
       background: var(--input-bg) !important;
       color: var(--input-color) !important;
       border-color: var(--mp-orange) !important;
-      box-shadow: 0 0 0 .2rem rgba(255,98,0,.2) !important;
+      box-shadow: 0 0 0 .2rem rgba(58,114,214,.2) !important;
     }
     .input-group-text {
       background: var(--bg-table-head) !important;
@@ -190,33 +184,27 @@
       color: var(--text-main) !important;
     }
 
-    /* ── Dark mode: Bootstrap overrides ──────────────────────────────────── */
+    /* ── Dark mode Bootstrap overrides ───────────────────────────────────── */
     [data-theme="dark"] .text-dark   { color: var(--text-main) !important; }
     [data-theme="dark"] .text-body   { color: var(--text-main) !important; }
     [data-theme="dark"] .text-muted  { color: var(--text-muted) !important; }
     [data-theme="dark"] .fw-medium,
     [data-theme="dark"] .fw-semibold,
     [data-theme="dark"] .fw-bold     { color: inherit; }
-
     [data-theme="dark"] .form-label  { color: var(--text-main) !important; }
     [data-theme="dark"] .form-text   { color: var(--text-muted) !important; }
     [data-theme="dark"] label        { color: var(--text-main) !important; }
-
     [data-theme="dark"] .table-light { background: var(--bg-table-head) !important; color: var(--text-muted) !important; }
     [data-theme="dark"] .table       { --bs-table-color: var(--text-main); --bs-table-bg: transparent; --bs-table-border-color: var(--border-color); }
     [data-theme="dark"] .table-hover { --bs-table-hover-bg: var(--bg-card-hover); --bs-table-hover-color: var(--text-main); }
-
     [data-theme="dark"] .card        { --bs-card-color: var(--text-main); }
     [data-theme="dark"] .card-body   { color: var(--text-main) !important; }
-
     [data-theme="dark"] .modal-header .btn-close { filter: invert(1) grayscale(1); }
     [data-theme="dark"] ol, [data-theme="dark"] li { color: var(--text-muted); }
-
     [data-theme="dark"] .alert-info    { background: #1a2535; border-color: #1f3a5f; color: #89b4fa; }
     [data-theme="dark"] .alert-success { background: #182620; border-color: #1e3d28; color: #a6e3a1; }
     [data-theme="dark"] .alert-danger  { background: #2a1520; border-color: #4a1f2f; color: #f38ba8; }
   </style>
-  <!-- Prevent flash of wrong theme: apply saved theme before paint -->
   <script>
     (function() {
       var t = localStorage.getItem('mp-theme') || 'light';
@@ -238,23 +226,23 @@
       <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">
-            <i class="bi bi-house me-1"></i>Dashboard
+            <i class="bi bi-house me-1"></i>{{ t.nav_dashboard }}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'searches' %}active{% endif %}" href="/searches">
-            <i class="bi bi-search me-1"></i>Zoekopdrachten
+            <i class="bi bi-search me-1"></i>{{ t.nav_searches }}
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="/settings">
-            <i class="bi bi-gear me-1"></i>Instellingen
+            <i class="bi bi-gear me-1"></i>{{ t.nav_settings }}
           </a>
         </li>
         <li class="nav-item ms-lg-2">
-          <button id="theme-toggle" title="Wissel thema">
+          <button id="theme-toggle" title="Toggle theme">
             <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-            <span id="theme-label" class="ms-1">Dark</span>
+            <span id="theme-label" class="ms-1">{{ t.nav_dark }}</span>
           </button>
         </li>
       </ul>
@@ -282,20 +270,21 @@
     var btn   = document.getElementById('theme-toggle');
     var icon  = document.getElementById('theme-icon');
     var label = document.getElementById('theme-label');
+    var labelDark  = {{ t.nav_dark  | tojson }};
+    var labelLight = {{ t.nav_light | tojson }};
 
     function applyTheme(theme) {
       html.setAttribute('data-theme', theme);
       localStorage.setItem('mp-theme', theme);
       if (theme === 'dark') {
-        icon.className  = 'bi bi-sun-fill';
-        label.textContent = 'Light';
+        icon.className = 'bi bi-sun-fill';
+        label.textContent = labelLight;
       } else {
-        icon.className  = 'bi bi-moon-stars-fill';
-        label.textContent = 'Dark';
+        icon.className = 'bi bi-moon-stars-fill';
+        label.textContent = labelDark;
       }
     }
 
-    // Initialise button state from stored preference
     applyTheme(localStorage.getItem('mp-theme') || 'light');
 
     btn.addEventListener('click', function () {

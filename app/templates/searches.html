@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Zoekopdrachten — Marktplaats Monitor{% endblock %}
+{% block title %}{{ t.search_title }} — Marktplaats Monitor{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="fw-bold mb-0"><i class="bi bi-search me-2"></i>Zoekopdrachten</h4>
+  <h4 class="fw-bold mb-0"><i class="bi bi-search me-2"></i>{{ t.search_title }}</h4>
   <button class="btn btn-mp" data-bs-toggle="modal" data-bs-target="#addModal">
-    <i class="bi bi-plus-lg me-1"></i>Nieuwe zoekopdracht
+    <i class="bi bi-plus-lg me-1"></i>{{ t.search_new }}
   </button>
 </div>
 
@@ -15,12 +15,12 @@
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
-          <th>Naam</th>
-          <th>URL</th>
-          <th>Interval</th>
-          <th>Gevonden</th>
-          <th>Laatste run</th>
-          <th>Status</th>
+          <th>{{ t.search_col_name }}</th>
+          <th>{{ t.search_col_url }}</th>
+          <th>{{ t.search_col_interval }}</th>
+          <th>{{ t.search_col_found }}</th>
+          <th>{{ t.search_col_last_run }}</th>
+          <th>{{ t.search_col_status }}</th>
           <th></th>
         </tr>
       </thead>
@@ -30,52 +30,47 @@
           <td class="fw-semibold">{{ s.name }}</td>
           <td>
             <a href="{{ s.url }}" target="_blank" rel="noopener"
-               class="text-muted text-decoration-none small"
-               title="{{ s.url }}">
+               class="text-muted text-decoration-none small" title="{{ s.url }}">
               {{ s.url | truncate(50) }}
               <i class="bi bi-box-arrow-up-right ms-1" style="font-size:.7rem"></i>
             </a>
           </td>
-          <td class="text-nowrap">{{ s.interval_minutes }} min</td>
+          <td class="text-nowrap">{{ s.interval_minutes }} {{ t.search_interval_unit }}</td>
           <td>{{ s.item_count }}</td>
           <td class="text-muted small text-nowrap">
             {{ s.last_run | time_ago if s.last_run else '–' }}
           </td>
           <td>
             {% if s.active %}
-              <span class="badge bg-success rounded-pill">Actief</span>
+              <span class="badge bg-success rounded-pill">{{ t.search_badge_active }}</span>
             {% else %}
-              <span class="badge bg-secondary rounded-pill">Gestopt</span>
+              <span class="badge bg-secondary rounded-pill">{{ t.search_badge_paused }}</span>
             {% endif %}
           </td>
           <td class="text-end text-nowrap">
             <button class="btn btn-sm btn-outline-primary"
-                    title="Bewerken"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editModal"
-                    data-id="{{ s.id }}"
-                    data-name="{{ s.name }}"
-                    data-interval="{{ s.interval_minutes }}">
+                    title="{{ t.search_btn_edit }}"
+                    data-bs-toggle="modal" data-bs-target="#editModal"
+                    data-id="{{ s.id }}" data-name="{{ s.name }}" data-interval="{{ s.interval_minutes }}">
               <i class="bi bi-pencil"></i>
             </button>
             <form method="post" action="/searches/{{ s.id }}/toggle" class="d-inline">
               <button class="btn btn-sm {% if s.active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
-                      title="{% if s.active %}Pauzeren{% else %}Hervatten{% endif %}">
+                      title="{% if s.active %}{{ t.search_btn_pause }}{% else %}{{ t.search_btn_resume }}{% endif %}">
                 <i class="bi {% if s.active %}bi-pause-fill{% else %}bi-play-fill{% endif %}"></i>
               </button>
             </form>
             <form method="post" action="/searches/{{ s.id }}/reset" class="d-inline"
-                  onsubmit="return confirm('Alle geziene items wissen? De volgende run zaait opnieuw in zonder meldingen.')">
-              <button class="btn btn-sm btn-outline-secondary" title="Reset (wis geziene items)">
+                  data-msg="{{ t.search_reset_confirm }}"
+                  onsubmit="return confirm(this.dataset.msg)">
+              <button class="btn btn-sm btn-outline-secondary" title="{{ t.search_btn_reset }}">
                 <i class="bi bi-arrow-counterclockwise"></i>
               </button>
             </form>
             <button class="btn btn-sm btn-outline-danger"
-                    title="Verwijderen"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteModal"
-                    data-id="{{ s.id }}"
-                    data-name="{{ s.name }}">
+                    title="{{ t.search_btn_delete }}"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-id="{{ s.id }}" data-name="{{ s.name }}">
               <i class="bi bi-trash"></i>
             </button>
           </td>
@@ -88,20 +83,20 @@
 {% else %}
 <div class="text-center py-5 text-muted">
   <i class="bi bi-search" style="font-size:3rem"></i>
-  <p class="mt-3">Geen zoekopdrachten. Voeg er een toe via de knop hierboven.</p>
+  <p class="mt-3">{{ t.search_none }}</p>
 </div>
 {% endif %}
 
 <!-- Tip card -->
 <div class="card border-0 bg-light mt-4 rounded-3">
   <div class="card-body">
-    <h6 class="fw-semibold"><i class="bi bi-lightbulb me-2 text-warning"></i>Hoe voeg je een URL toe?</h6>
+    <h6 class="fw-semibold"><i class="bi bi-lightbulb me-2 text-warning"></i>{{ t.tip_title }}</h6>
     <ol class="mb-0 small text-muted">
-      <li>Ga naar <a href="https://www.marktplaats.nl" target="_blank">marktplaats.nl</a> en stel je zoekopdracht en filters in.</li>
-      <li>Kopieer de volledige URL uit de adresbalk (inclusief <code>#</code>-gedeelte).</li>
-      <li>Plak de URL hieronder en geef een naam op.</li>
+      <li>{{ t.tip_step1 }}</li>
+      <li>{{ t.tip_step2 }}</li>
+      <li>{{ t.tip_step3 }}</li>
     </ol>
-    <p class="mt-2 mb-0 small text-muted"><strong>Voorbeeld:</strong>
+    <p class="mt-2 mb-0 small text-muted"><strong>{{ t.tip_example }}</strong>
       <code>https://www.marktplaats.nl/q/iphone+13/#priceFrom=200&amp;priceTo=600</code>
     </p>
   </div>
@@ -113,31 +108,29 @@
     <div class="modal-content rounded-3 border-0 shadow">
       <form method="post" action="/searches/add">
         <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold">Nieuwe zoekopdracht</h5>
+          <h5 class="modal-title fw-bold">{{ t.modal_add_title }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Naam</label>
-            <input type="text" name="name" class="form-control" placeholder="bv. iPhone 13 Pro" required>
+            <label class="form-label fw-semibold">{{ t.modal_name_label }}</label>
+            <input type="text" name="name" class="form-control" placeholder="{{ t.modal_name_ph }}" required>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Marktplaats URL</label>
-            <input type="url" name="url" class="form-control"
-                   placeholder="https://www.marktplaats.nl/q/iphone/#priceFrom=200"
-                   required>
-            <div class="form-text">Kopieer de URL direct uit je browser na het instellen van filters.</div>
+            <label class="form-label fw-semibold">{{ t.modal_url_label }}</label>
+            <input type="url" name="url" class="form-control" placeholder="{{ t.modal_url_ph }}" required>
+            <div class="form-text">{{ t.modal_url_hint }}</div>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Interval (minuten)</label>
+            <label class="form-label fw-semibold">{{ t.modal_interval_label }}</label>
             <input type="number" name="interval" class="form-control" value="5" min="1" max="1440">
-            <div class="form-text">Hoe vaak wordt er gecheckt? Minimaal 1 minuut.</div>
+            <div class="form-text">{{ t.modal_interval_hint }}</div>
           </div>
         </div>
         <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ t.modal_cancel }}</button>
           <button type="submit" class="btn btn-mp">
-            <i class="bi bi-plus-lg me-1"></i>Toevoegen
+            <i class="bi bi-plus-lg me-1"></i>{{ t.modal_add_btn }}
           </button>
         </div>
       </form>
@@ -151,21 +144,19 @@
     <div class="modal-content rounded-3 border-0 shadow">
       <div class="modal-header border-0 pb-0">
         <h5 class="modal-title fw-bold text-danger">
-          <i class="bi bi-trash me-2"></i>Zoekopdracht verwijderen
+          <i class="bi bi-trash me-2"></i>{{ t.modal_delete_title }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-1">Weet je zeker dat je <strong id="deleteName"></strong> wilt verwijderen?</p>
-        <p class="text-muted small mb-0">Alle bijbehorende gevonden advertenties worden ook gewist. Dit kan niet ongedaan worden gemaakt.</p>
+        <p class="mb-1">{{ t.modal_delete_body1 }} <strong id="deleteName"></strong> {{ t.modal_delete_body2 }}</p>
+        <p class="text-muted small mb-0">{{ t.modal_delete_warning }}</p>
       </div>
       <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-          Annuleren
-        </button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ t.modal_cancel }}</button>
         <form method="post" id="deleteForm" class="d-inline">
           <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash me-1"></i>Verwijderen
+            <i class="bi bi-trash me-1"></i>{{ t.modal_delete_btn }}
           </button>
         </form>
       </div>
@@ -179,24 +170,24 @@
     <div class="modal-content rounded-3 border-0 shadow">
       <form method="post" id="editForm">
         <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Zoekopdracht bewerken</h5>
+          <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>{{ t.modal_edit_title }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Naam</label>
+            <label class="form-label fw-semibold">{{ t.modal_name_label }}</label>
             <input type="text" name="name" id="editName" class="form-control" required>
           </div>
           <div class="mb-3">
-            <label class="form-label fw-semibold">Interval (minuten)</label>
+            <label class="form-label fw-semibold">{{ t.modal_interval_label }}</label>
             <input type="number" name="interval" id="editInterval" class="form-control" min="1" max="1440">
-            <div class="form-text">Hoe vaak wordt er gecheckt? Minimaal 1 minuut.</div>
+            <div class="form-text">{{ t.modal_interval_hint }}</div>
           </div>
         </div>
         <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ t.modal_cancel }}</button>
           <button type="submit" class="btn btn-mp">
-            <i class="bi bi-floppy me-1"></i>Opslaan
+            <i class="bi bi-floppy me-1"></i>{{ t.modal_save_btn }}
           </button>
         </div>
       </form>

@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime, timezone
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g
 
 import log_buffer
+import translations
 from db import init_db, get_conn, get_setting, set_setting
 from notifier import send_discord, send_telegram, format_price
 import monitor
@@ -22,7 +23,21 @@ app = Flask(__name__)
 app.secret_key = 'mp-monitor-change-me-in-production'
 
 
-# ── Template helpers ──────────────────────────────────────────────────────────
+# ── i18n helpers ──────────────────────────────────────────────────────────────
+def _lang() -> str:
+    if not hasattr(g, 'lang'):
+        g.lang = get_setting('language', 'nl')
+    return g.lang
+
+def _t() -> dict:
+    return translations.get(_lang())
+
+@app.context_processor
+def inject_i18n():
+    return {'t': _t(), 'lang': _lang()}
+
+
+# ── Template filters ──────────────────────────────────────────────────────────
 @app.template_filter('price')
 def price_filter(item) -> str:
     if isinstance(item, dict):
@@ -32,19 +47,20 @@ def price_filter(item) -> str:
 
 @app.template_filter('time_ago')
 def time_ago_filter(dt_str: str) -> str:
+    t = _t()
     if not dt_str:
-        return '–'
+        return t['time_unknown']
     try:
         dt = datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
         diff = datetime.now(timezone.utc) - dt
         secs = int(diff.total_seconds())
         if secs < 60:
-            return f'{secs}s geleden'
+            return f'{secs}{t["time_sec"]}'
         if secs < 3600:
-            return f'{secs // 60}m geleden'
+            return f'{secs // 60}{t["time_min"]}'
         if secs < 86400:
-            return f'{secs // 3600}u geleden'
-        return f'{secs // 86400}d geleden'
+            return f'{secs // 3600}{t["time_hour"]}'
+        return f'{secs // 86400}{t["time_day"]}'
     except Exception:
         return dt_str
 
@@ -97,6 +113,7 @@ def searches():
 
 @app.route('/searches/add', methods=['POST'])
 def add_search():
+    t = _t()
     name = request.form.get('name', '').strip()
     url = request.form.get('url', '').strip()
     try:
@@ -105,11 +122,11 @@ def add_search():
         interval = 5
 
     if not name or not url:
-        flash('Naam en URL zijn verplicht.', 'danger')
+        flash(t['flash_name_url_required'], 'danger')
         return redirect(url_for('searches'))
 
     if 'marktplaats.nl' not in url:
-        flash('Voer een geldige Marktplaats-URL in.', 'danger')
+        flash(t['flash_invalid_url'], 'danger')
         return redirect(url_for('searches'))
 
     with get_conn() as conn:
@@ -118,12 +135,13 @@ def add_search():
             (name, url, interval),
         )
 
-    flash(f'Zoekopdracht "{name}" toegevoegd.', 'success')
+    flash(t['flash_search_added'].format(name), 'success')
     return redirect(url_for('searches'))
 
 
 @app.route('/searches/<int:sid>/edit', methods=['POST'])
 def edit_search(sid: int):
+    t = _t()
     name = request.form.get('name', '').strip()
     try:
         interval = max(1, int(request.form.get('interval', 5)))
@@ -131,7 +149,7 @@ def edit_search(sid: int):
         interval = 5
 
     if not name:
-        flash('Naam is verplicht.', 'danger')
+        flash(t['flash_name_required'], 'danger')
         return redirect(url_for('searches'))
 
     with get_conn() as conn:
@@ -140,7 +158,7 @@ def edit_search(sid: int):
             (name, interval, sid),
         )
 
-    flash(f'Zoekopdracht bijgewerkt.', 'success')
+    flash(t['flash_search_updated'], 'success')
     return redirect(url_for('searches'))
 
 
@@ -155,10 +173,9 @@ def toggle_search(sid: int):
 
 @app.route('/searches/<int:sid>/reset', methods=['POST'])
 def reset_search(sid: int):
-    """Delete seen items so the next run seeds fresh (without sending notifications)."""
     with get_conn() as conn:
         conn.execute('DELETE FROM seen_items WHERE search_id = ?', (sid,))
-    flash('Geziene items gewist. De volgende run zaait opnieuw in.', 'info')
+    flash(_t()['flash_reset_done'], 'info')
     return redirect(url_for('searches'))
 
 
@@ -166,7 +183,7 @@ def reset_search(sid: int):
 def delete_search(sid: int):
     with get_conn() as conn:
         conn.execute('DELETE FROM searches WHERE id = ?', (sid,))
-    flash('Zoekopdracht verwijderd.', 'success')
+    flash(_t()['flash_search_deleted'], 'success')
     return redirect(url_for('searches'))
 
 
@@ -176,7 +193,7 @@ def settings():
         set_setting('discord_webhook', request.form.get('discord_webhook', '').strip())
         set_setting('telegram_token', request.form.get('telegram_token', '').strip())
         set_setting('telegram_chat_id', request.form.get('telegram_chat_id', '').strip())
-        flash('Instellingen opgeslagen.', 'success')
+        flash(_t()['flash_settings_saved'], 'success')
         return redirect(url_for('settings'))
 
     return render_template(
@@ -193,16 +210,24 @@ def settings():
 def toggle_notification(service: str):
     if service not in ('discord', 'telegram'):
         return redirect(url_for('settings'))
+    t = _t()
     key = f'{service}_enabled'
     new_val = '0' if get_setting(key, '1') == '1' else '1'
     set_setting(key, new_val)
     label = 'Discord' if service == 'discord' else 'Telegram'
-    state = 'gepauzeerd' if new_val == '0' else 'hervat'
-    flash(f'{label} notificaties {state}.', 'success')
+    msg_key = 'flash_notif_paused' if new_val == '0' else 'flash_notif_resumed'
+    flash(t[msg_key].format(label), 'success')
     return redirect(url_for('settings'))
 
 
-# ── API endpoints (used by the frontend via fetch) ────────────────────────────
+@app.route('/settings/language/<string:lang>', methods=['POST'])
+def set_language(lang: str):
+    if lang in ('nl', 'en'):
+        set_setting('language', lang)
+    return redirect(url_for('settings'))
+
+
+# ── API endpoints ─────────────────────────────────────────────────────────────
 @app.route('/api/logs')
 def api_logs():
     return jsonify(log_buffer.get_recent())
@@ -210,9 +235,10 @@ def api_logs():
 
 @app.route('/api/test/discord', methods=['POST'])
 def api_test_discord():
+    t = _t()
     webhook = get_setting('discord_webhook')
     if not webhook:
-        return jsonify({'error': 'Geen Discord webhook ingesteld.'}), 400
+        return jsonify({'error': t['api_no_discord']}), 400
     try:
         send_discord(webhook, [_test_item()], 'Test')
         return jsonify({'ok': True})
@@ -222,10 +248,11 @@ def api_test_discord():
 
 @app.route('/api/test/telegram', methods=['POST'])
 def api_test_telegram():
+    t = _t()
     token = get_setting('telegram_token')
     chat_id = get_setting('telegram_chat_id')
     if not token or not chat_id:
-        return jsonify({'error': 'Telegram token of chat-ID ontbreekt.'}), 400
+        return jsonify({'error': t['api_no_telegram']}), 400
     try:
         send_telegram(token, chat_id, [_test_item()], 'Test')
         return jsonify({'ok': True})

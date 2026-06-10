@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Instellingen — Marktplaats Monitor{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-4"><i class="bi bi-gear me-2"></i>Instellingen</h4>
+
+<form method="post">
+  <!-- Discord -->
+  <div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-semibold mb-1">
+        <i class="bi bi-discord me-2" style="color:#5865f2"></i>Discord
+      </h5>
+      <p class="text-muted small mb-3">
+        Maak een webhook aan via je Discord-server › Kanaalinstellingen › Integraties › Webhooks.
+      </p>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label fw-semibold">Webhook URL</label>
+          <div class="input-group">
+            <input type="url" name="discord_webhook" class="form-control"
+                   value="{{ discord_webhook }}"
+                   placeholder="https://discord.com/api/webhooks/...">
+            <button type="button" class="btn btn-outline-secondary" id="test-discord">
+              <i class="bi bi-send me-1"></i>Test
+            </button>
+          </div>
+          <div id="discord-result" class="form-text mt-1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telegram -->
+  <div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-semibold mb-1">
+        <i class="bi bi-telegram me-2" style="color:#229ed9"></i>Telegram
+      </h5>
+      <p class="text-muted small mb-3">
+        Maak een bot aan via <a href="https://t.me/BotFather" target="_blank">@BotFather</a> en stuur een bericht
+        naar je bot. Gebruik daarna
+        <a href="https://api.telegram.org/bot{TOKEN}/getUpdates" target="_blank">getUpdates</a>
+        om je chat-ID op te halen.
+      </p>
+      <div class="row g-3">
+        <div class="col-md-7">
+          <label class="form-label fw-semibold">Bot Token</label>
+          <input type="text" name="telegram_token" class="form-control"
+                 value="{{ telegram_token }}"
+                 placeholder="123456789:ABCdef...">
+        </div>
+        <div class="col-md-5">
+          <label class="form-label fw-semibold">Chat ID</label>
+          <div class="input-group">
+            <input type="text" name="telegram_chat_id" class="form-control"
+                   value="{{ telegram_chat_id }}"
+                   placeholder="-1001234567890">
+            <button type="button" class="btn btn-outline-secondary" id="test-telegram">
+              <i class="bi bi-send me-1"></i>Test
+            </button>
+          </div>
+        </div>
+        <div id="telegram-result" class="col-12 form-text mt-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-mp px-4">
+    <i class="bi bi-floppy me-1"></i>Opslaan
+  </button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function testNotification(endpoint, resultId) {
+  const el = document.getElementById(resultId);
+  el.textContent = 'Versturen…';
+  el.className = 'form-text text-muted mt-1';
+  try {
+    const r = await fetch(endpoint, { method: 'POST' });
+    const data = await r.json();
+    if (data.ok) {
+      el.textContent = '✓ Testbericht verzonden!';
+      el.className = 'form-text text-success mt-1';
+    } else {
+      el.textContent = '✗ ' + (data.error || 'Onbekende fout');
+      el.className = 'form-text text-danger mt-1';
+    }
+  } catch(e) {
+    el.textContent = '✗ Verzoek mislukt: ' + e;
+    el.className = 'form-text text-danger mt-1';
+  }
+}
+
+document.getElementById('test-discord').addEventListener('click', () =>
+  testNotification('/api/test/discord', 'discord-result'));
+document.getElementById('test-telegram').addEventListener('click', () =>
+  testNotification('/api/test/telegram', 'telegram-result'));
+</script>
+{% endblock %}

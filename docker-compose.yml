@@ -1,0 +1,13 @@
+services:
+  marktplaats-monitor:
+    image: ghcr.io/richrdj/mp-scraper:latest
+    pull_policy: always
+    container_name: marktplaats-monitor
+    ports:
+      - "8000:8000"
+    volumes:
+      - mp_data:/data
+    restart: unless-stopped
+
+volumes:
+  mp_data:

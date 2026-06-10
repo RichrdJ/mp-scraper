@@ -1,9 +1,10 @@
+import html
 import logging
 import requests
 
 logger = logging.getLogger(__name__)
 
-MP_COLOR = 0xff6200  # Marktplaats orange
+MP_COLOR = 0x3a72d6
 
 
 def format_price(price_cents: int, price_type: str) -> str:
@@ -46,35 +47,65 @@ def send_discord(webhook_url: str, items: list[dict], search_name: str) -> None:
             logger.error('Discord notification failed for "%s": %s', item.get('title'), e)
 
 
+def _tg_text(item: dict, search_name: str) -> str:
+    """Build an HTML-formatted Telegram message (safer than Markdown for arbitrary titles)."""
+    price = format_price(item['price_cents'], item['price_type'])
+    title = html.escape(item['title'])
+    city  = html.escape(item['city'] or 'Onbekend')
+    sname = html.escape(search_name)
+    url   = item['url']
+    return (
+        f'🔔 <b>{sname}</b>\n'
+        f'<b>{title}</b>\n'
+        f'💶 {price}\n'
+        f'📍 {city}\n'
+        f'<a href="{url}">Bekijk advertentie</a>'
+    )
+
+
 def send_telegram(token: str, chat_id: str, items: list[dict], search_name: str) -> None:
     base = f'https://api.telegram.org/bot{token}'
     for item in items:
-        price = format_price(item['price_cents'], item['price_type'])
-        caption = (
-            f'\U0001f514 *{search_name}*\n'
-            f'*{item["title"]}*\n'
-            f'\U0001f4b6 {price}\n'
-            f'\U0001f4cd {item["city"] or "Onbekend"}\n'
-            f'[Bekijk advertentie]({item["url"]})'
-        )
-        if item.get('image_url'):
-            endpoint = f'{base}/sendPhoto'
-            payload = {
-                'chat_id': chat_id,
-                'photo': item['image_url'],
-                'caption': caption,
-                'parse_mode': 'Markdown',
-            }
-        else:
-            endpoint = f'{base}/sendMessage'
-            payload = {
-                'chat_id': chat_id,
-                'text': caption,
-                'parse_mode': 'Markdown',
-                'disable_web_page_preview': False,
-            }
-        try:
-            r = requests.post(endpoint, json=payload, timeout=10)
-            r.raise_for_status()
-        except Exception as e:
-            logger.error('Telegram notification failed for "%s": %s', item.get('title'), e)
+        text = _tg_text(item, search_name)
+        image_url = item.get('image_url') or ''
+
+        # Ensure image URL is absolute
+        if image_url.startswith('//'):
+            image_url = 'https:' + image_url
+
+        sent = False
+
+        # Try sending with photo first
+        if image_url:
+            try:
+                r = requests.post(
+                    f'{base}/sendPhoto',
+                    json={
+                        'chat_id': chat_id,
+                        'photo': image_url,
+                        'caption': text,
+                        'parse_mode': 'HTML',
+                    },
+                    timeout=15,
+                )
+                r.raise_for_status()
+                sent = True
+            except Exception as e:
+                logger.warning('sendPhoto failed for "%s", falling back to text: %s', item.get('title'), e)
+
+        # Fall back to plain text message
+        if not sent:
+            try:
+                r = requests.post(
+                    f'{base}/sendMessage',
+                    json={
+                        'chat_id': chat_id,
+                        'text': text,
+                        'parse_mode': 'HTML',
+                        'disable_web_page_preview': False,
+                    },
+                    timeout=10,
+                )
+                r.raise_for_status()
+            except Exception as e:
+                logger.error('Telegram notification failed for "%s": %s', item.get('title'), e)

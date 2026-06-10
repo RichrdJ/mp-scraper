@@ -1,8 +1,18 @@
-# 🔔 Marktplaats Monitor
+<div align="center">
+  <img src="https://raw.githubusercontent.com/RichrdJ/mp-scraper/main/docs/banner.svg" alt="Marktplaats Monitor" width="100%"/>
+</div>
+
+<br>
+
+<div align="center">
+  <a href="https://github.com/RichrdJ/mp-scraper/releases"><img src="https://img.shields.io/github/v/release/RichrdJ/mp-scraper?color=3a72d6&label=release&style=flat-square" alt="Release"/></a>
+  <a href="https://github.com/RichrdJ/mp-scraper/pkgs/container/mp-scraper"><img src="https://img.shields.io/badge/ghcr.io-mp--scraper-3a72d6?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
+  <a href="https://github.com/RichrdJ/mp-scraper/actions"><img src="https://img.shields.io/github/actions/workflow/status/RichrdJ/mp-scraper/docker.yml?style=flat-square&label=build&color=3a72d6" alt="Build"/></a>
+</div>
+
+<br>
 
 Nooit meer een koopje missen op Marktplaats. Stel zoekopdrachten in en ontvang direct een melding zodra er een nieuwe advertentie verschijnt — via Discord, Telegram of gewoon in de webinterface.
-
-![dark mode dashboard](https://raw.githubusercontent.com/RichrdJ/mp-scraper/main/docs/screenshot-dark.png)
 
 ---
 

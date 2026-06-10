@@ -65,24 +65,78 @@
     }
 
     /* ── Navbar ───────────────────────────────────────────────────────────── */
-    .navbar { background: var(--mp-orange) !important; }
-    .navbar-brand { font-weight: 700; font-size: 1.2rem; }
-    .navbar .nav-link { color: rgba(255,255,255,.85) !important; }
+    .navbar {
+      background: linear-gradient(135deg, #0b0e1a 0%, #141829 100%) !important;
+      border-bottom: 1px solid rgba(58,114,214,.18);
+      position: relative;
+      padding-top: 0 !important;
+    }
+
+    /* Blue accent line at the very top */
+    .navbar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3a72d6 0%, #6ea3f5 50%, #3a72d6 100%);
+      z-index: 10;
+    }
+
+    /* Subtle dot-grid decoration (matches banner) */
+    .navbar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(58,114,214,.13) 1px, transparent 1px);
+      background-size: 22px 22px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .navbar > .container {
+      position: relative;
+      z-index: 1;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -.3px;
+      color: #fff !important;
+    }
+
+    .navbar-brand .brand-icon {
+      color: #6ea3f5;
+      filter: drop-shadow(0 0 6px rgba(110,163,245,.6));
+    }
+
+    .navbar .nav-link { color: rgba(255,255,255,.75) !important; transition: color .15s; }
     .navbar .nav-link:hover,
     .navbar .nav-link.active { color: #fff !important; }
 
+    .navbar .nav-link.active {
+      background: rgba(58,114,214,.25);
+      border-radius: 8px;
+    }
+
     #theme-toggle {
-      background: rgba(255,255,255,.15);
-      border: none;
+      background: rgba(58,114,214,.2);
+      border: 1px solid rgba(58,114,214,.35);
       border-radius: 20px;
-      color: #fff;
-      padding: 4px 10px;
-      font-size: .85rem;
+      color: #a8c8ff;
+      padding: 4px 12px;
+      font-size: .82rem;
       cursor: pointer;
-      transition: background .2s;
+      transition: background .2s, border-color .2s;
       white-space: nowrap;
     }
-    #theme-toggle:hover { background: rgba(255,255,255,.28); }
+    #theme-toggle:hover {
+      background: rgba(58,114,214,.38);
+      border-color: rgba(110,163,245,.6);
+      color: #fff;
+    }
 
     /* ── Cards ────────────────────────────────────────────────────────────── */
     .card {
@@ -216,8 +270,8 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand text-white" href="/">
-      <i class="bi bi-bell-fill me-2"></i>Marktplaats Monitor
+    <a class="navbar-brand" href="/">
+      <i class="bi bi-bell-fill me-2 brand-icon"></i>Marktplaats Monitor
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>

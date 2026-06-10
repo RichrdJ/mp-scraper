@@ -16,6 +16,7 @@ logging.basicConfig(
     datefmt='%H:%M:%S',
 )
 log_buffer.setup()
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # ── Flask app ─────────────────────────────────────────────────────────────────

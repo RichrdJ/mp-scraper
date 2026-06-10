@@ -184,7 +184,22 @@ def settings():
         discord_webhook=get_setting('discord_webhook'),
         telegram_token=get_setting('telegram_token'),
         telegram_chat_id=get_setting('telegram_chat_id'),
+        discord_enabled=get_setting('discord_enabled', '1') == '1',
+        telegram_enabled=get_setting('telegram_enabled', '1') == '1',
     )
+
+
+@app.route('/settings/toggle/<string:service>', methods=['POST'])
+def toggle_notification(service: str):
+    if service not in ('discord', 'telegram'):
+        return redirect(url_for('settings'))
+    key = f'{service}_enabled'
+    new_val = '0' if get_setting(key, '1') == '1' else '1'
+    set_setting(key, new_val)
+    label = 'Discord' if service == 'discord' else 'Telegram'
+    state = 'gepauzeerd' if new_val == '0' else 'hervat'
+    flash(f'{label} notificaties {state}.', 'success')
+    return redirect(url_for('settings'))
 
 
 # ── API endpoints (used by the frontend via fetch) ────────────────────────────

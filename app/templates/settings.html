@@ -8,9 +8,17 @@
   <!-- Discord -->
   <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body p-4">
-      <h5 class="fw-semibold mb-1">
-        <i class="bi bi-discord me-2" style="color:#5865f2"></i>Discord
-      </h5>
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <h5 class="fw-semibold mb-0">
+          <i class="bi bi-discord me-2" style="color:#5865f2"></i>Discord
+        </h5>
+        <form method="post" action="/settings/toggle/discord">
+          <button type="submit" class="btn btn-sm {{ 'btn-success' if discord_enabled else 'btn-outline-secondary' }}">
+            <i class="bi {{ 'bi-bell-fill' if discord_enabled else 'bi-bell-slash' }} me-1"></i>
+            {{ 'Actief' if discord_enabled else 'Gepauzeerd' }}
+          </button>
+        </form>
+      </div>
       <p class="text-muted small mb-3">
         Maak een webhook aan via je Discord-server › Kanaalinstellingen › Integraties › Webhooks.
       </p>
@@ -34,9 +42,17 @@
   <!-- Telegram -->
   <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body p-4">
-      <h5 class="fw-semibold mb-1">
-        <i class="bi bi-telegram me-2" style="color:#229ed9"></i>Telegram
-      </h5>
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <h5 class="fw-semibold mb-0">
+          <i class="bi bi-telegram me-2" style="color:#229ed9"></i>Telegram
+        </h5>
+        <form method="post" action="/settings/toggle/telegram">
+          <button type="submit" class="btn btn-sm {{ 'btn-success' if telegram_enabled else 'btn-outline-secondary' }}">
+            <i class="bi {{ 'bi-bell-fill' if telegram_enabled else 'bi-bell-slash' }} me-1"></i>
+            {{ 'Actief' if telegram_enabled else 'Gepauzeerd' }}
+          </button>
+        </form>
+      </div>
       <p class="text-muted small mb-3">
         Maak een bot aan via <a href="https://t.me/BotFather" target="_blank">@BotFather</a> en stuur een bericht
         naar je bot. Gebruik daarna

@@ -88,12 +88,12 @@ def _mark_run(search_id: int) -> None:
 
 def _notify(items: list[dict], search_name: str) -> None:
     discord_url = get_setting('discord_webhook')
-    if discord_url:
+    if discord_url and get_setting('discord_enabled', '1') == '1':
         send_discord(discord_url, items, search_name)
 
     tg_token = get_setting('telegram_token')
     tg_chat = get_setting('telegram_chat_id')
-    if tg_token and tg_chat:
+    if tg_token and tg_chat and get_setting('telegram_enabled', '1') == '1':
         send_telegram(tg_token, tg_chat, items, search_name)
 
 

@@ -122,6 +122,28 @@ def add_search():
     return redirect(url_for('searches'))
 
 
+@app.route('/searches/<int:sid>/edit', methods=['POST'])
+def edit_search(sid: int):
+    name = request.form.get('name', '').strip()
+    try:
+        interval = max(1, int(request.form.get('interval', 5)))
+    except ValueError:
+        interval = 5
+
+    if not name:
+        flash('Naam is verplicht.', 'danger')
+        return redirect(url_for('searches'))
+
+    with get_conn() as conn:
+        conn.execute(
+            'UPDATE searches SET name = ?, interval_minutes = ? WHERE id = ?',
+            (name, interval, sid),
+        )
+
+    flash(f'Zoekopdracht bijgewerkt.', 'success')
+    return redirect(url_for('searches'))
+
+
 @app.route('/searches/<int:sid>/toggle', methods=['POST'])
 def toggle_search(sid: int):
     with get_conn() as conn:

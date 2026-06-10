@@ -49,6 +49,15 @@
             {% endif %}
           </td>
           <td class="text-end text-nowrap">
+            <button class="btn btn-sm btn-outline-primary"
+                    title="Bewerken"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editModal"
+                    data-id="{{ s.id }}"
+                    data-name="{{ s.name }}"
+                    data-interval="{{ s.interval_minutes }}">
+              <i class="bi bi-pencil"></i>
+            </button>
             <form method="post" action="/searches/{{ s.id }}/toggle" class="d-inline">
               <button class="btn btn-sm {% if s.active %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
                       title="{% if s.active %}Pauzeren{% else %}Hervatten{% endif %}">
@@ -133,4 +142,46 @@
     </div>
   </div>
 </div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-3 border-0 shadow">
+      <form method="post" id="editForm">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold"><i class="bi bi-pencil me-2"></i>Zoekopdracht bewerken</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Naam</label>
+            <input type="text" name="name" id="editName" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Interval (minuten)</label>
+            <input type="number" name="interval" id="editInterval" class="form-control" min="1" max="1440">
+            <div class="form-text">Hoe vaak wordt er gecheckt? Minimaal 1 minuut.</div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuleren</button>
+          <button type="submit" class="btn btn-mp">
+            <i class="bi bi-floppy me-1"></i>Opslaan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('editModal').addEventListener('show.bs.modal', function (e) {
+  var btn = e.relatedTarget;
+  document.getElementById('editName').value     = btn.dataset.name;
+  document.getElementById('editInterval').value = btn.dataset.interval;
+  document.getElementById('editForm').action    = '/searches/' + btn.dataset.id + '/edit';
+});
+</script>
 {% endblock %}

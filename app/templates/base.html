@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,50 +8,116 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    /* ── Theme variables ──────────────────────────────────────────────────── */
     :root {
       --mp-orange: #ff6200;
       --mp-orange-dark: #d94f00;
     }
-    body { background: #f4f5f7; font-family: 'Segoe UI', sans-serif; }
 
+    [data-theme="light"] {
+      --bg-body:        #f4f5f7;
+      --bg-card:        #ffffff;
+      --bg-card-hover:  #f8f9fa;
+      --bg-table-head:  #f8f9fa;
+      --bg-tip:         #f8f9fa;
+      --text-main:      #212529;
+      --text-muted:     #6c757d;
+      --text-heading:   #212529;
+      --border-color:   #dee2e6;
+      --shadow-sm:      0 2px 8px rgba(0,0,0,.08);
+      --shadow-md:      0 6px 18px rgba(0,0,0,.12);
+      --thumb-bg:       linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+      --thumb-color:    #adb5bd;
+      --input-bg:       #fff;
+      --input-color:    #212529;
+      --input-border:   #ced4da;
+      --bs-body-bg:     #f4f5f7;
+      --bs-body-color:  #212529;
+    }
+
+    [data-theme="dark"] {
+      --bg-body:        #111318;
+      --bg-card:        #1c1e26;
+      --bg-card-hover:  #22252f;
+      --bg-table-head:  #16181f;
+      --bg-tip:         #16181f;
+      --text-main:      #e2e4ec;
+      --text-muted:     #8b8fa8;
+      --text-heading:   #f0f1f5;
+      --border-color:   #2a2d3a;
+      --shadow-sm:      0 2px 8px rgba(0,0,0,.35);
+      --shadow-md:      0 6px 18px rgba(0,0,0,.45);
+      --thumb-bg:       linear-gradient(135deg, #22252f 0%, #1c1e26 100%);
+      --thumb-color:    #4a4d5e;
+      --input-bg:       #22252f;
+      --input-color:    #e2e4ec;
+      --input-border:   #2a2d3a;
+      --bs-body-bg:     #111318;
+      --bs-body-color:  #e2e4ec;
+    }
+
+    /* ── Base ─────────────────────────────────────────────────────────────── */
+    body {
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: 'Segoe UI', sans-serif;
+      transition: background .2s, color .2s;
+    }
+
+    /* ── Navbar ───────────────────────────────────────────────────────────── */
     .navbar { background: var(--mp-orange) !important; }
     .navbar-brand { font-weight: 700; font-size: 1.2rem; }
     .navbar .nav-link { color: rgba(255,255,255,.85) !important; }
     .navbar .nav-link:hover,
     .navbar .nav-link.active { color: #fff !important; }
 
-    .stat-card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    /* Dark mode toggle button */
+    #theme-toggle {
+      background: rgba(255,255,255,.15);
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      padding: 4px 10px;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    #theme-toggle:hover { background: rgba(255,255,255,.28); }
+
+    /* ── Cards ────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card) !important;
+      border-color: var(--border-color) !important;
+      color: var(--text-main) !important;
+    }
+    .stat-card { border: none !important; border-radius: 12px; box-shadow: var(--shadow-sm); }
     .stat-card .stat-icon { font-size: 2rem; opacity: .7; }
     .stat-card .stat-value { font-size: 2rem; font-weight: 700; }
 
     .item-card {
-      border: none;
+      border: none !important;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      box-shadow: var(--shadow-sm);
       transition: transform .15s, box-shadow .15s;
       overflow: hidden;
     }
-    .item-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+    .item-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .item-card .item-thumb {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      background: #e9ecef;
+      width: 100%; height: 160px; object-fit: cover;
     }
     .item-card .item-thumb-placeholder {
       height: 160px;
-      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #adb5bd;
-      font-size: 2.5rem;
+      background: var(--thumb-bg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--thumb-color); font-size: 2.5rem;
     }
     .item-price { font-size: 1.1rem; font-weight: 700; color: var(--mp-orange); }
     .badge-search { background: var(--mp-orange); font-size: .7rem; }
 
+    /* ── Log box (always dark — it's a terminal) ──────────────────────────── */
     .log-box {
-      background: #1e1e2e;
+      background: #0d0f14;
       color: #cdd6f4;
       border-radius: 10px;
       font-family: 'Courier New', monospace;
@@ -60,16 +126,82 @@
       overflow-y: auto;
       padding: 12px 16px;
     }
-    .log-INFO  { color: #a6e3a1; }
-    .log-ERROR { color: #f38ba8; }
+    .log-INFO    { color: #a6e3a1; }
+    .log-ERROR   { color: #f38ba8; }
     .log-WARNING { color: #fab387; }
-    .log-DEBUG { color: #89b4fa; }
+    .log-DEBUG   { color: #89b4fa; }
 
-    .table thead th { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; }
+    /* ── Table ────────────────────────────────────────────────────────────── */
+    .table {
+      color: var(--text-main) !important;
+      border-color: var(--border-color) !important;
+    }
+    .table thead th {
+      font-size: .8rem; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--text-muted);
+      background: var(--bg-table-head);
+      border-color: var(--border-color) !important;
+    }
+    .table tbody tr { border-color: var(--border-color) !important; }
+    .table-hover tbody tr:hover { background: var(--bg-card-hover) !important; }
 
+    /* ── Form controls ────────────────────────────────────────────────────── */
+    .form-control, .form-select {
+      background: var(--input-bg) !important;
+      color: var(--input-color) !important;
+      border-color: var(--input-border) !important;
+    }
+    .form-control::placeholder { color: var(--text-muted) !important; }
+    .form-control:focus, .form-select:focus {
+      background: var(--input-bg) !important;
+      color: var(--input-color) !important;
+      border-color: var(--mp-orange) !important;
+      box-shadow: 0 0 0 .2rem rgba(255,98,0,.2) !important;
+    }
+    .input-group-text {
+      background: var(--bg-table-head) !important;
+      color: var(--text-main) !important;
+      border-color: var(--input-border) !important;
+    }
+
+    /* ── Modal ────────────────────────────────────────────────────────────── */
+    .modal-content {
+      background: var(--bg-card) !important;
+      color: var(--text-main) !important;
+      border-color: var(--border-color) !important;
+    }
+
+    /* ── Misc ─────────────────────────────────────────────────────────────── */
+    .bg-light { background: var(--bg-tip) !important; }
+    .text-muted { color: var(--text-muted) !important; }
+    h1,h2,h3,h4,h5,h6 { color: var(--text-heading); }
+    hr { border-color: var(--border-color); }
+    code { color: var(--mp-orange); background: transparent; }
+
+    /* ── Buttons ──────────────────────────────────────────────────────────── */
     .btn-mp { background: var(--mp-orange); border-color: var(--mp-orange); color: #fff; }
     .btn-mp:hover { background: var(--mp-orange-dark); border-color: var(--mp-orange-dark); color: #fff; }
+    .btn-outline-secondary {
+      color: var(--text-muted) !important;
+      border-color: var(--border-color) !important;
+    }
+    .btn-outline-secondary:hover {
+      background: var(--bg-card-hover) !important;
+      color: var(--text-main) !important;
+    }
+
+    /* Alert tweak for dark */
+    [data-theme="dark"] .alert-info    { background: #1a2535; border-color: #1f3a5f; color: #89b4fa; }
+    [data-theme="dark"] .alert-success { background: #182620; border-color: #1e3d28; color: #a6e3a1; }
+    [data-theme="dark"] .alert-danger  { background: #2a1520; border-color: #4a1f2f; color: #f38ba8; }
   </style>
+  <!-- Prevent flash of wrong theme: apply saved theme before paint -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('mp-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
 </head>
 <body>
 
@@ -82,7 +214,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="nav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
         <li class="nav-item">
           <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="/">
             <i class="bi bi-house me-1"></i>Dashboard
@@ -97,6 +229,12 @@
           <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="/settings">
             <i class="bi bi-gear me-1"></i>Instellingen
           </a>
+        </li>
+        <li class="nav-item ms-lg-2">
+          <button id="theme-toggle" title="Wissel thema">
+            <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+            <span id="theme-label" class="ms-1">Dark</span>
+          </button>
         </li>
       </ul>
     </div>
@@ -117,6 +255,33 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function () {
+    var html  = document.documentElement;
+    var btn   = document.getElementById('theme-toggle');
+    var icon  = document.getElementById('theme-icon');
+    var label = document.getElementById('theme-label');
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('mp-theme', theme);
+      if (theme === 'dark') {
+        icon.className  = 'bi bi-sun-fill';
+        label.textContent = 'Light';
+      } else {
+        icon.className  = 'bi bi-moon-stars-fill';
+        label.textContent = 'Dark';
+      }
+    }
+
+    // Initialise button state from stored preference
+    applyTheme(localStorage.getItem('mp-theme') || 'light');
+
+    btn.addEventListener('click', function () {
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
